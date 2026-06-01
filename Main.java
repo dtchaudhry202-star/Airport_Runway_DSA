@@ -1,27 +1,47 @@
-class ShoppingCartDemo {
+import java.io.*;
+import java.util.*;
+
+class DocumentDictionary {
 
     public static void main(String[] args) {
 
-        Product p1 = new Product(1, "Laptop", 1000);
-        Product p2 = new Product(2, "Mouse", 20);
-        Product p3 = new Product(3, "Keyboard", 50);
+        HashMap<String, Wordinfo> dictionary = new HashMap<>();
 
-        ShoppingCart cart = new ShoppingCart();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("src/document.txt"));
 
-        cart.addProduct(p1, 1);
-        cart.addProduct(p2, 2);
-        cart.addProduct(p3, 1);
+            String line;
+            int lineNumber = 0;
 
-        cart.displayCart();
+            while ((line = br.readLine()) != null) {
 
-        cart.updateQuantity(p2, 5);
+                lineNumber++;
 
-        System.out.println("\nAfter Updating Mouse Quantity:");
-        cart.displayCart();
+                line = line.toLowerCase().replaceAll("[^a-zA-Z0-9 ]", "");
 
-        cart.removeProduct(p3);
+                String[] words = line.split("\\s+");
 
-        System.out.println("\nAfter Removing Keyboard:");
-        cart.displayCart();
+                for (String word : words) {
+
+                    if (word.isEmpty())
+                        continue;
+
+                    dictionary.putIfAbsent(word, new Wordinfo());
+
+                    dictionary.get(word).addOccurrence(lineNumber);
+                }
+            }
+
+            br.close();
+
+            System.out.println("DOCUMENT DICTIONARY");
+
+            for (Map.Entry<String, Wordinfo> entry : dictionary.entrySet()) {
+                System.out.println(entry.getKey() + " -> " + entry.getValue());
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }
